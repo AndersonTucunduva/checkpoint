@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Ou PostgreSQL se necessário
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id        String   @id @default(uuid())
+  name      String
+  faceData  String // Dados do rosto armazenados
+  createdAt DateTime @default(now())
+  punches   Punch[]  @relation("EmployeePunches")
+}
+
+model Punch {
+  id         String    @id @default(uuid())
+  employeeId String    @relation(fields: [employeeId], references: [id])
+  type       PunchType
+  createdAt  DateTime  @default(now())
+}
+
+enum PunchType {
+  ENTRY
+  LUNCH_OUT
+  LUNCH_IN
+  EXIT
+}
