@@ -1,8 +1,23 @@
+'use client'
+import { useEffect, useState } from "react";
 import { getAllPunches } from "./actions";
 import Table from "@/components/Table";
+import { PunchType } from "@prisma/client";
 
-export default async function Dashboard() {
-  const punches = await getAllPunches();
+type Punch = {
+  id: string;
+  employeeId: string;
+  type: PunchType;
+  createdAt: Date;
+  employee: { id: string; name: string };
+};
+
+export default function Dashboard() {
+  const [punches, setPunches] = useState<Punch[]>([]);
+
+  useEffect(() => {
+    getAllPunches().then(setPunches).catch(console.error);
+  }, []);
 
   return (
     <div className="p-6">

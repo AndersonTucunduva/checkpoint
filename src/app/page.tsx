@@ -1,59 +1,33 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
+'use client'
+import { useState } from "react";
+import Camera from "@/components/Camera";
+import PunchButton from "@/components/PunchButton";
+import Dashboard from "./dashboard";
+import { verifyFace } from "@/app/actions";
 
-export default function Camera({ onRecognize }: { onRecognize: (faceData: Float32Array) => void }) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [faceapi, setFaceapi] = useState<any>(null);
-  const [modelsLoaded, setModelsLoaded] = useState(false);
+type Employee = { id: string; name: string; faceData: string };
 
-  useEffect(() => {
-    async function loadFaceAPI() {
-      const faceApiModule = await import("face-api.js");
-      setFaceapi(faceApiModule);
+export default function Home() {
+  const [employee, setEmployee] = useState<Employee | null>(null);
 
-      await faceApiModule.nets.ssdMobilenetv1.loadFromUri("/models");
-      await faceApiModule.nets.faceLandmark68Net.loadFromUri("/models");
-      await faceApiModule.nets.faceRecognitionNet.loadFromUri("/models");
-      setModelsLoaded(true);
-    }
-
-    loadFaceAPI();
-  }, []);
-
-  useEffect(() => {
-    if (!modelsLoaded || !faceapi) return;
-
-    async function startCamera() {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream as MediaStream;
+  async function handleFaceRecognition(faceData: Float32Array) {
+    try {
+      const response = await verifyFace(JSON.stringify(Array.from(faceData)));
+      if (response) {
+        setEmployee(response);
+      } else {
+        alert("Funcionário não encontrado!");
       }
-    }
-
-    startCamera();
-  }, [modelsLoaded, faceapi]);
-
-  async function handleCapture() {
-    if (!videoRef.current || !faceapi) return;
-
-    const detection = await faceapi
-      .detectSingleFace(videoRef.current, new faceapi.SsdMobilenetv1Options())
-      .withFaceLandmarks()
-      .withFaceDescriptor();
-
-    if (detection) {
-      onRecognize(detection.descriptor);
-    } else {
-      alert("Nenhum rosto detectado!");
+    } catch (error) {
+      console.error("Erro ao verificar o rosto:", error);
     }
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <video ref={videoRef} autoPlay muted className="w-64 h-48 border rounded" />
-      <button onClick={handleCapture} className="px-4 py-2 bg-blue-500 text-white rounded">
-        Capturar Rosto
-      </button>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Registro de Ponto</h1>
+      {!employee ? <Camera onRecognize={handleFaceRecognition} /> : <PunchButton employeeId={employee.id} onSuccess={() => setEmployee(null)} />}
+      <Dashboard />
     </div>
   );
 }

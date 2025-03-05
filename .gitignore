@@ -20,6 +20,9 @@
 # production
 /build
 
+# BD
+/checkpoint
+
 # misc
 .DS_Store
 *.pem

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // Ou PostgreSQL se necessário
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -12,12 +12,13 @@ model Employee {
   name      String
   faceData  String // Dados do rosto armazenados
   createdAt DateTime @default(now())
-  punches   Punch[]  @relation("EmployeePunches")
+  punches   Punch[] // Apenas mantém a relação sem @relation
 }
 
 model Punch {
   id         String    @id @default(uuid())
-  employeeId String    @relation(fields: [employeeId], references: [id])
+  employeeId String
+  employee   Employee  @relation(fields: [employeeId], references: [id]) // Relação correta
   type       PunchType
   createdAt  DateTime  @default(now())
 }

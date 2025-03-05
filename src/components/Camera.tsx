@@ -11,9 +11,12 @@ export default function Camera({ onRecognize }: { onRecognize: (faceData: Float3
       const faceApiModule = await import("face-api.js");
       setFaceapi(faceApiModule);
 
-      await faceApiModule.nets.ssdMobilenetv1.loadFromUri("/models");
-      await faceApiModule.nets.faceLandmark68Net.loadFromUri("/models");
-      await faceApiModule.nets.faceRecognitionNet.loadFromUri("/models");
+      await Promise.all([
+        faceApiModule.nets.ssdMobilenetv1.loadFromUri("/models"),
+        faceApiModule.nets.faceLandmark68Net.loadFromUri("/models"),
+        faceApiModule.nets.faceRecognitionNet.loadFromUri("/models"),
+      ]);
+
       setModelsLoaded(true);
     }
 
@@ -25,9 +28,7 @@ export default function Camera({ onRecognize }: { onRecognize: (faceData: Float3
 
     async function startCamera() {
       const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream as MediaStream;
-      }
+      if (videoRef.current) videoRef.current.srcObject = stream;
     }
 
     startCamera();
@@ -41,11 +42,11 @@ export default function Camera({ onRecognize }: { onRecognize: (faceData: Float3
       .withFaceLandmarks()
       .withFaceDescriptor();
 
-    if (detection) {
-      onRecognize(detection.descriptor);
-    } else {
-      alert("Nenhum rosto detectado!");
-    }
+      if (detection) {
+        onRecognize(detection.descriptor);
+      } else {
+        alert("Nenhum rosto detectado!");
+      }
   }
 
   return (

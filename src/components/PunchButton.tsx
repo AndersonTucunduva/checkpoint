@@ -14,11 +14,11 @@ export default function PunchButton({ employeeId, onSuccess }: PunchButtonProps)
   const handlePunch = async () => {
     setLoading(true);
     try {
-      await registerPunch(employeeId);
-      alert("Ponto registrado com sucesso!");
-      onSuccess();
-    } catch (error) {
-      alert(error);
+      const response = await registerPunch(employeeId);
+      alert(response.success ? "Ponto registrado com sucesso!" : "Erro ao registrar ponto!");
+      if (response.success) onSuccess();
+    } catch {
+      alert("Falha na comunicação com o servidor.");
     } finally {
       setLoading(false);
     }
