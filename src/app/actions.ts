@@ -117,3 +117,33 @@ export async function getAllPunches() {
     orderBy: { createdAt: 'desc' },
   })
 }
+
+export async function getEmployeePunches(employeeId: string) {
+  const punches = await prisma.punch.findMany({
+    where: { employeeId },
+    orderBy: { createdAt: 'asc' },
+  })
+
+  // Agrupar por data e organizar por tipo
+  const groupedPunches: Record<string, Record<string, string>> = {}
+
+  punches.forEach((punch) => {
+    const date = punch.createdAt.toISOString().split('T')[0]
+    if (!groupedPunches[date]) {
+      groupedPunches[date] = {
+        ENTRY: '--:--',
+        LUNCH_OUT: '--:--',
+        LUNCH_IN: '--:--',
+        EXIT: '--:--',
+      }
+    }
+    groupedPunches[date][punch.type] = new Date(
+      punch.createdAt,
+    ).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  })
+
+  return groupedPunches
+}
