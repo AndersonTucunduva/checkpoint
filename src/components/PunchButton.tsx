@@ -15,19 +15,15 @@ export default function PunchButton({
   const [loading, setLoading] = useState(false)
 
   const handlePunch = async () => {
-    setLoading(true)
-    try {
-      const response = await registerPunch(employeeId)
-      alert(
-        response.success
-          ? 'Ponto registrado com sucesso!'
-          : 'Erro ao registrar ponto!',
-      )
-      if (response.success) onSuccess()
-    } catch {
-      alert('Falha na comunicação com o servidor.')
-    } finally {
+    const response = await registerPunch(employeeId)
+
+    if (response.success) {
+      setLoading(true)
+      onSuccess()
+      alert('Ponto registrado com sucesso!')
       setLoading(false)
+    } else {
+      alert('Funcionário não encontrado')
     }
   }
 
