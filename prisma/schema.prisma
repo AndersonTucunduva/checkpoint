@@ -20,7 +20,7 @@ model Punch {
   employeeId String
   employee   Employee  @relation(fields: [employeeId], references: [id])
   type       PunchType
-  obs        String
+  obs        String?
   createdAt  DateTime  @default(now())
 }
 
