@@ -23,6 +23,12 @@
 # BD
 /checkpoint
 
+#keys
+server.crt
+server.csr
+server.key
+server.js
+
 # misc
 .DS_Store
 *.pem
