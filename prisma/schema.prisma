@@ -10,16 +10,17 @@ datasource db {
 model Employee {
   id        String   @id @default(uuid())
   name      String
-  faceData  String // Dados do rosto armazenados
+  faceData  String
   createdAt DateTime @default(now())
-  punches   Punch[] // Apenas mantém a relação sem @relation
+  punches   Punch[]
 }
 
 model Punch {
   id         String    @id @default(uuid())
   employeeId String
-  employee   Employee  @relation(fields: [employeeId], references: [id]) // Relação correta
+  employee   Employee  @relation(fields: [employeeId], references: [id])
   type       PunchType
+  obs        String
   createdAt  DateTime  @default(now())
 }
 
