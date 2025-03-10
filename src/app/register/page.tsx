@@ -11,6 +11,15 @@ export default function RegisterEmployee() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
+  function handleFaceRecognition(data: Float32Array | null) {
+    if (data) {
+      setFaceData(data)
+      setMessage('Rosto capturado com sucesso!')
+    } else {
+      setMessage('Falha ao capturar o rosto. Tente novamente.')
+    }
+  }
+
   async function handleRegister() {
     if (!name.trim() || !faceData) {
       setMessage('Por favor, preencha todos os campos.')
@@ -45,7 +54,7 @@ export default function RegisterEmployee() {
           className="w-full p-2 border rounded mb-4"
         />
 
-        <Camera onRecognize={setFaceData} />
+        <Camera onRecognize={handleFaceRecognition} />
 
         <Button
           onClick={handleRegister}
